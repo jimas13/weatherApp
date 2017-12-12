@@ -1,32 +1,40 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs/Rx';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/operator/mergemap';
+import 'rxjs/add/observable/of';
+import { IWeather } from './weather';
 
 @Injectable()
 export class LocationService {
-  reqString: string;
-  constructor(private _http: HttpClient) {
+  constructor (
+    private _http: HttpClient
+  ) { }
 
+  public fetchTemp(): Observable<any> {
+    return Observable.fromPromise(this.getQueryString()).mergeMap(queryString => {
+      return this._http.get(queryString);
+    });
   }
-  fetchTemp(): Observable<any> {
-    if (window.navigator && window.navigator.geolocation) {
-      window.navigator.geolocation.getCurrentPosition(
-        position => {
-          this.reqString = "https://fcc-weather-api.glitch.me/api/current?lat=" + position.coords.latitude + "&lon=" + position.coords.longitude;
-          console.log(this.reqString);
-          return this._http.get<any>(this.reqString)
-            .map(res =>
-              res.json()
-            )
-            .catch(this.handleError);
-        }
-      );
-    };
-    return;
 
+  private getQueryString(): Promise<string> {
+    return this.getPosition().then(p => {
+      return this.createQueryString(p.coords.latitude, p.coords.longitude);
+    });
+  }
+
+  private createQueryString(lat, lon): string {
+    return `https://fcc-weather-api.glitch.me/api/current?lat=${lat}&lon=${lon}`;
+  }
+
+  private getPosition(): Promise<any> {
+    return new Promise(function (resolve, reject) {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
   }
 
   private handleError(err: HttpErrorResponse) {

@@ -1,5 +1,16 @@
-<div>{{name}}</div>
-<div>{{temp}}</div>
-<div>{{humidity}}</div>
-<div>{{country}}</div>
-<div>{{description}}</div>
+
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Weather</a>
+      </nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-9">
+            <div>{{name}} , {{country}}</div>
+            <div>Temperature: {{temp}}</div>
+            <div>Humidity: {{humidity}}</div>
+            <div>Description: {{description}}</div>
+            <img src={{icon}}>
+        </div>
+    </div>
+</div>
